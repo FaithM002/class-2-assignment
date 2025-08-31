@@ -1,15 +1,17 @@
+#check working directory
 getwd()
 
-classify_gene<-classify_gene <- function(logFC, padj) {
+#create classify gene function
+classify_gene<- function(logFC, padj) {
   if (padj < 0.05 && logFC > 1) {
     return("Upregulated")
   } else if (padj < 0.05 && logFC < -1) {
     return("Downregulated")
   } else {
     return("Not_Significant")
-  }
-}
+  }}
 
+#import data
 Data_1<-read.csv("raw_data/DEGs_Data_1.csv")
 Data_2<-read.csv("raw_data/DEGs_Data_2.csv")
 
@@ -24,10 +26,12 @@ output_dir<-"results"
 
 # Files to process
 files_to_process <-  c("DEGs_Data_1.csv","DEGs_Data_2.csv")
+
 # Loop through files
 for (file_name in files_to_process) {
   # Read the dataset
   data <- read.csv(file.path(input_dir, file_name))
+
   # Replace missing padj with 1
   data$padj[is.na(data$padj)] <- 1
   
@@ -36,8 +40,7 @@ for (file_name in files_to_process) {
   
   # Apply classify_gene function for each row
   for (i in 1:nrow(data)) {
-    status_vec[i] <- classify_gene(data$logFC[i], data$padj[i])
-  }
+    status_vec[i] <- classify_gene(data$logFC[i], data$padj[i])}
   
   # Add status column
   data$status <- status_vec
@@ -47,6 +50,6 @@ for (file_name in files_to_process) {
   
   # Print summary counts
   cat("\nSummary for", file_name, ":\n")
-  print(table(data$status))
-}
+  print(table(data$status))}
+
 
