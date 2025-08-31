@@ -1,0 +1,52 @@
+getwd()
+
+classify_gene<-classify_gene <- function(logFC, padj) {
+  if (padj < 0.05 && logFC > 1) {
+    return("Upregulated")
+  } else if (padj < 0.05 && logFC < -1) {
+    return("Downregulated")
+  } else {
+    return("Not_Significant")
+  }
+}
+
+Data_1<-read.csv("raw_data/DEGs_Data_1.csv")
+Data_2<-read.csv("raw_data/DEGs_Data_2.csv")
+
+#check if directory exists
+dir.exists("raw_data")
+dir.exists("results")
+
+#assign directories
+input_dir<-"raw_data"
+output_dir<-"results"
+
+
+# Files to process
+files_to_process <-  c("DEGs_Data_1.csv","DEGs_Data_2.csv")
+# Loop through files
+for (file_name in files_to_process) {
+  # Read the dataset
+  data <- read.csv(file.path(input_dir, file_name))
+  # Replace missing padj with 1
+  data$padj[is.na(data$padj)] <- 1
+  
+  # Initialize an empty vector to store statuses
+  status_vec <- vector("character", length = nrow(data))
+  
+  # Apply classify_gene function for each row
+  for (i in 1:nrow(data)) {
+    status_vec[i] <- classify_gene(data$logFC[i], data$padj[i])
+  }
+  
+  # Add status column
+  data$status <- status_vec
+  
+  # Save processed data to Results folder
+  write.csv(data, file.path(output_dir, paste0("Processed_", file_name)), row.names = FALSE)
+  
+  # Print summary counts
+  cat("\nSummary for", file_name, ":\n")
+  print(table(data$status))
+}
+
